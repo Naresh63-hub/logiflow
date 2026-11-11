@@ -158,6 +158,14 @@ class AppLocalizations {
       'privacyPolicy': 'Privacy & Data Security Policy',
       'offlineBanner': 'Offline Mode: Local database active. Changes will auto-sync.',
       'onlineBanner': 'Online: Real-time connection active.',
+      'notifications': 'Notifications',
+      'notificationPrefs': 'Notification Preferences',
+      'pushAlerts': 'Shipment Status Push Alerts',
+      'podAlertsOnly': 'Proof of Delivery Alerts',
+      'sortNewest': 'Newest First',
+      'sortOldest': 'Oldest First',
+      'assignDriver': 'Assign Delivery Personnel',
+      'routeOverview': 'Hub Corridor & Route Overview',
     },
     'hi': {
       // General
@@ -298,6 +306,14 @@ class AppLocalizations {
       'privacyPolicy': 'गोपनीयता एवं डेटा सुरक्षा नीति',
       'offlineBanner': 'ऑफ़लाइन मोड: स्थानीय डेटाबेस सक्रिय। नेटवर्क आने पर सिंक होगा।',
       'onlineBanner': 'ऑनलाइन: लाइव कनेक्शन सक्रिय।',
+      'notifications': 'सूचनाएं',
+      'notificationPrefs': 'सूचना प्राथमिकताएं',
+      'pushAlerts': 'शिपमेंट स्थिति पुश अलर्ट',
+      'podAlertsOnly': 'डिलीवरी प्रमाण (POD) अलर्ट',
+      'sortNewest': 'नवीनतम पहले',
+      'sortOldest': 'सबसे पुराना पहले',
+      'assignDriver': 'डिलीवरी कर्मी नियुक्त करें',
+      'routeOverview': 'हब कॉरिडोर एवं मार्ग विवरण',
     },
   };
 

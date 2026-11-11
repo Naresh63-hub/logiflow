@@ -12,6 +12,58 @@ import '../../shipments/presentation/shipments_provider.dart';
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
+  void _showNotificationsSheet(BuildContext context, List<ShipmentModel> recent) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  context.tr('notifications'),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(ctx),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (recent.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                child: Center(child: Text('No shipment alerts yet.')),
+              )
+            else
+              ...recent.take(4).map((s) => ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: CircleAvatar(
+                      backgroundColor: s.currentStatus.color.withOpacity(0.15),
+                      child: Icon(s.currentStatus.icon, color: s.currentStatus.color, size: 18),
+                    ),
+                    title: Text('${s.trackingNumber} • ${s.currentStatus.displayName}',
+                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                    subtitle: Text('Recipient: ${s.receiverName}', style: const TextStyle(fontSize: 12)),
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      context.push('/shipments/${s.id}');
+                    },
+                  )),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(currentUserProvider);
@@ -33,6 +85,11 @@ class DashboardScreen extends ConsumerWidget {
           ],
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined),
+            tooltip: context.tr('notifications'),
+            onPressed: () => _showNotificationsSheet(context, metrics.recentShipments),
+          ),
           IconButton(
             icon: const Icon(Icons.qr_code_scanner),
             tooltip: context.tr('scanShipment'),
@@ -155,6 +212,72 @@ class DashboardScreen extends ConsumerWidget {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 12),
+                    _MetricCard(
+                      title: context.tr('delayed'),
+                      value: metrics.delayed.toString(),
+                      icon: Icons.warning_amber_rounded,
+                      color: AppColors.error,
+                    ),
+                    if (metrics.distribution.isNotEmpty) ...[
+                      const SizedBox(height: 20),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).cardTheme.color,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: AppColors.borderLight),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              context.tr('statusDistribution'),
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                            ),
+                            const SizedBox(height: 12),
+                            ...metrics.distribution.entries.map((entry) {
+                              final ratio = metrics.total > 0 ? entry.value / metrics.total : 0.0;
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          context.tr(entry.key.translationKey),
+                                          style: const TextStyle(fontSize: 12),
+                                        ),
+                                        Text(
+                                          '${entry.value} (${(ratio * 100).toStringAsFixed(0)}%)',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                            color: entry.key.color,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(4),
+                                      child: LinearProgressIndicator(
+                                        value: ratio,
+                                        minHeight: 6,
+                                        backgroundColor: entry.key.color.withOpacity(0.15),
+                                        valueColor: AlwaysStoppedAnimation<Color>(entry.key.color),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
+                          ],
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 24),
 
                     // Quick Actions

@@ -137,6 +137,45 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
 
+          // Notification Preferences Card
+          Card(
+            margin: EdgeInsets.zero,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.notifications_active_outlined, color: AppColors.secondary),
+                      const SizedBox(width: 8),
+                      Text(
+                        context.tr('notificationPrefs'),
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(context.tr('pushAlerts')),
+                    subtitle: const Text('FCM status milestones & dispatch notices', style: TextStyle(fontSize: 12)),
+                    value: settings.pushAlertsEnabled,
+                    onChanged: (val) => ref.read(settingsProvider.notifier).setPushAlertsEnabled(val),
+                  ),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(context.tr('podAlertsOnly')),
+                    subtitle: const Text('Instant confirmation when receiver signs POD', style: TextStyle(fontSize: 12)),
+                    value: settings.podAlertsEnabled,
+                    onChanged: (val) => ref.read(settingsProvider.notifier).setPodAlertsEnabled(val),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
           // Offline Sync Status Card
           Card(
             margin: EdgeInsets.zero,

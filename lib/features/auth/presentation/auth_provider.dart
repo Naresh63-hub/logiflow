@@ -69,6 +69,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  Future<void> updateProfile(String fullName, String phone) async {
+    final current = state.user;
+    if (current == null) return;
+    final updated = await _repository.updateProfile(
+      current.copyWith(fullName: fullName, phone: phone),
+    );
+    state = state.copyWith(user: updated);
+  }
+
   Future<void> logout() async {
     state = state.copyWith(isLoading: true);
     await _repository.logout();

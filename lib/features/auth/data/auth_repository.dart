@@ -108,6 +108,20 @@ class AuthRepository {
     return null;
   }
 
+  Future<UserModel> updateProfile(UserModel updated) async {
+    await _cacheUser(updated);
+    final supabase = SupabaseConfig.client;
+    if (supabase != null && SupabaseConfig.isRealBackendConfigured) {
+      try {
+        await supabase.from('profiles').update({
+          'full_name': updated.fullName,
+          'phone': updated.phone,
+        }).eq('id', updated.id);
+      } catch (_) {}
+    }
+    return updated;
+  }
+
   Future<void> logout() async {
     final supabase = SupabaseConfig.client;
     if (supabase != null) {

@@ -11,14 +11,35 @@ import '../../../shared/widgets/status_badge.dart';
 import '../domain/shipment_model.dart';
 import 'shipments_provider.dart';
 
-class ShipmentListScreen extends ConsumerWidget {
+class ShipmentListScreen extends ConsumerStatefulWidget {
   const ShipmentListScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ShipmentListScreen> createState() => _ShipmentListScreenState();
+}
+
+class _ShipmentListScreenState extends ConsumerState<ShipmentListScreen> {
+  late final TextEditingController _searchController;
+  bool _sortAscending = false;
+  int _visibleCount = 6;
+  static const int _pageSize = 6;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController(text: ref.read(shipmentSearchQueryProvider));
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final shipmentsAsync = ref.watch(shipmentsStreamProvider);
     final selectedFilter = ref.watch(shipmentStatusFilterProvider);
-    final searchController = TextEditingController(text: ref.watch(shipmentSearchQueryProvider));
 
     final filters = <ShipmentStatus?>[
       null, // All
@@ -35,6 +56,13 @@ class ShipmentListScreen extends ConsumerWidget {
         title: Text(context.tr('navShipments')),
         actions: [
           IconButton(
+            icon: Icon(_sortAscending ? Icons.arrow_upward : Icons.arrow_downward),
+            tooltip: _sortAscending ? context.tr('sortOldest') : context.tr('sortNewest'),
+            onPressed: () {
+              setState(() => _sortAscending = !_sortAscending);
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.qr_code_scanner),
             tooltip: context.tr('scanShipment'),
             onPressed: () => context.push('/scan'),
@@ -49,15 +77,15 @@ class ShipmentListScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: TextField(
-              controller: searchController,
+              controller: _searchController,
               decoration: InputDecoration(
                 hintText: context.tr('search'),
                 prefixIcon: const Icon(Icons.search),
-                suffixIcon: searchController.text.isNotEmpty
+                suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.clear),
                         onPressed: () {
-                          searchController.clear();
+                          _searchController.clear();
                           ref.read(shipmentSearchQueryProvider.notifier).state = '';
                         },
                       )
@@ -90,6 +118,7 @@ class ShipmentListScreen extends ConsumerWidget {
                   selected: isSelected,
                   onSelected: (_) {
                     ref.read(shipmentStatusFilterProvider.notifier).state = filter;
+                    setState(() => _visibleCount = _pageSize);
                   },
                   backgroundColor: Theme.of(context).cardTheme.color,
                   selectedColor: AppColors.accent.withOpacity(0.2),
@@ -111,6 +140,7 @@ class ShipmentListScreen extends ConsumerWidget {
             child: RefreshIndicator(
               onRefresh: () async {
                 ref.invalidate(shipmentsStreamProvider);
+                setState(() => _visibleCount = _pageSize);
               },
               child: shipmentsAsync.when(
                 data: (shipments) {
@@ -128,6 +158,7 @@ class ShipmentListScreen extends ConsumerWidget {
                         if (selectedFilter != null || ref.watch(shipmentSearchQueryProvider).isNotEmpty) {
                           ref.read(shipmentStatusFilterProvider.notifier).state = null;
                           ref.read(shipmentSearchQueryProvider.notifier).state = '';
+                          _searchController.clear();
                         } else {
                           context.push('/create-shipment');
                         }
@@ -135,11 +166,30 @@ class ShipmentListScreen extends ConsumerWidget {
                     );
                   }
 
+                  final sorted = List<ShipmentModel>.from(shipments)
+                    ..sort((a, b) => _sortAscending
+                        ? a.createdAt.compareTo(b.createdAt)
+                        : b.createdAt.compareTo(a.createdAt));
+
+                  final hasMore = sorted.length > _visibleCount;
+                  final paged = sorted.take(_visibleCount).toList();
+
                   return ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    itemCount: shipments.length,
+                    itemCount: paged.length + (hasMore ? 1 : 0),
                     itemBuilder: (context, index) {
-                      final item = shipments[index];
+                      if (index == paged.length) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12.0),
+                          child: OutlinedButton(
+                            onPressed: () {
+                              setState(() => _visibleCount += _pageSize);
+                            },
+                            child: Text('Load More (${sorted.length - paged.length} remaining)'),
+                          ),
+                        );
+                      }
+                      final item = paged[index];
                       return _ShipmentListItemCard(shipment: item);
                     },
                   );

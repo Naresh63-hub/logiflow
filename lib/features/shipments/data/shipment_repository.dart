@@ -528,6 +528,57 @@ class ShipmentRepository {
     await _syncEngine.enqueueOperation(op);
   }
 
+  Future<void> assignDeliveryDriver({
+    required String shipmentId,
+    required String driverId,
+    required String driverName,
+    required String assignedBy,
+    required String userId,
+  }) async {
+    final current = await getShipmentById(shipmentId);
+    if (current == null) return;
+
+    final now = DateTime.now();
+
+    await (_db.update(_db.shipments)..where((tbl) => tbl.id.equals(shipmentId))).write(
+      ShipmentsCompanion(
+        assignedDriverId: Value(driverId),
+        updatedAt: Value(now),
+        isDirty: const Value(true),
+        syncStatus: const Value('pending'),
+        version: Value(current.version + 1),
+      ),
+    );
+
+    await _db.into(_db.shipmentEvents).insert(
+          ShipmentEventsCompanion.insert(
+            id: _uuid.v4(),
+            shipmentId: shipmentId,
+            previousStatus: Value(current.currentStatus.toDbString()),
+            newStatus: current.currentStatus.toDbString(),
+            locationName: 'Noida Sector 62 Central Hub',
+            remarks: Value('Delivery agent assigned: $driverName'),
+            updatedBy: assignedBy,
+            createdAt: now,
+          ),
+        );
+
+    final op = SyncOperationModel(
+      operationId: _uuid.v4(),
+      userId: userId,
+      shipmentId: shipmentId,
+      operationType: SyncOperationType.assignDriver,
+      payload: {
+        'assigned_driver_id': driverId,
+        'driver_name': driverName,
+        'assigned_by': assignedBy,
+        'version': current.version + 1,
+      },
+      localTimestamp: now,
+    );
+    await _syncEngine.enqueueOperation(op);
+  }
+
   Future<void> submitProofOfDelivery(ProofOfDeliveryModel pod) async {
     final now = DateTime.now();
 

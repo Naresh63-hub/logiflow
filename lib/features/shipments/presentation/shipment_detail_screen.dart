@@ -15,6 +15,70 @@ class ShipmentDetailScreen extends ConsumerWidget {
 
   const ShipmentDetailScreen({super.key, required this.shipmentId});
 
+  String _hubNameForId(String hubId) {
+    if (hubId.startsWith('2222')) return 'Greater Noida West Fulfillment Hub';
+    if (hubId.startsWith('3333')) return 'Okhla NCR Gateway Hub';
+    return 'Noida Sector 62 Central Hub';
+  }
+
+  void _showAssignDriverSheet(BuildContext context, WidgetRef ref, ShipmentModel shipment) {
+    final user = ref.read(currentUserProvider);
+    final drivers = [
+      {'id': 'cccccccc-cccc-cccc-cccc-cccccccccccc', 'name': 'Vikas Singh (Van #14 • Noida Sec 62)'},
+      {'id': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'name': 'Rohan Verma (Bike #07 • Greater Noida)'},
+      {'id': 'ffffffff-ffff-ffff-ffff-ffffffffffff', 'name': 'Arjun Chauhan (Van #09 • Okhla NCR)'},
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              context.tr('assignDriver'),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            ...drivers.map((d) => ListTile(
+                  leading: const CircleAvatar(
+                    backgroundColor: AppColors.secondary,
+                    child: Icon(Icons.delivery_dining, color: Colors.white),
+                  ),
+                  title: Text(d['name']!, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () async {
+                    Navigator.pop(ctx);
+                    await ref.read(shipmentRepositoryProvider).assignDeliveryDriver(
+                          shipmentId: shipment.id,
+                          driverId: d['id']!,
+                          driverName: d['name']!,
+                          assignedBy: user?.fullName ?? 'Hub Manager',
+                          userId: user?.id ?? 'hub_manager',
+                        );
+                    ref.invalidate(shipmentDetailProvider(shipment.id));
+                    ref.invalidate(shipmentEventsProvider(shipment.id));
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Assigned to ${d['name']}'),
+                          backgroundColor: AppColors.success,
+                        ),
+                      );
+                    }
+                  },
+                )),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showStatusUpdateSheet(BuildContext context, WidgetRef ref, ShipmentModel shipment) {
     final user = ref.read(currentUserProvider);
     final validTransitions = [
@@ -408,11 +472,107 @@ class ShipmentDetailScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
+                const SizedBox(height: 16),
+
+                // Hub Corridor & Route Overview (Functional Map Fallback)
+                Card(
+                  margin: EdgeInsets.zero,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.route_outlined, color: AppColors.secondary, size: 20),
+                            const SizedBox(width: 8),
+                            Text(
+                              context.tr('routeOverview'),
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryLight.withOpacity(0.06),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppColors.borderLight),
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.trip_origin, size: 16, color: AppColors.secondary),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      'Origin: ${_hubNameForId(shipment.originHubId)}',
+                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const Padding(
+                                padding: EdgeInsets.only(left: 7.0, top: 4, bottom: 4),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: SizedBox(height: 14, child: VerticalDivider(thickness: 2)),
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  const Icon(Icons.flag, size: 16, color: AppColors.accent),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      'Destination: ${_hubNameForId(shipment.destinationHubId)}',
+                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const Divider(height: 18),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'ETA: ${dateFormat.format(shipment.expectedDelivery)}',
+                                    style: const TextStyle(fontSize: 11, color: AppColors.textSecondaryLight),
+                                  ),
+                                  Text(
+                                    shipment.assignedDriverId != null
+                                        ? 'Courier Assigned'
+                                        : 'Awaiting Driver',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: shipment.assignedDriverId != null
+                                          ? AppColors.success
+                                          : AppColors.warning,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 24),
 
                 // Action Buttons for Hub Manager or Driver
                 if (shipment.currentStatus != ShipmentStatus.delivered) ...[
                   if (isHubManager) ...[
+                    OutlinedButton.icon(
+                      onPressed: () => _showAssignDriverSheet(context, ref, shipment),
+                      icon: const Icon(Icons.person_add_alt_1_outlined),
+                      label: Text(context.tr('assignDriver')),
+                    ),
+                    const SizedBox(height: 12),
                     ElevatedButton.icon(
                       onPressed: () => _showStatusUpdateSheet(context, ref, shipment),
                       icon: const Icon(Icons.edit_note),

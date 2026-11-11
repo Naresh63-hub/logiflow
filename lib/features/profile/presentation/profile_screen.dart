@@ -37,14 +37,21 @@ class ProfileScreen extends ConsumerWidget {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Profile updated successfully'),
-                  backgroundColor: AppColors.success,
-                ),
-              );
+            onPressed: () async {
+              final newName = nameController.text.trim();
+              final newPhone = phoneController.text.trim();
+              if (newName.isNotEmpty && newPhone.isNotEmpty) {
+                await ref.read(authProvider.notifier).updateProfile(newName, newPhone);
+              }
+              if (ctx.mounted) Navigator.pop(ctx);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Profile updated successfully'),
+                    backgroundColor: AppColors.success,
+                  ),
+                );
+              }
             },
             child: const Text('Save Changes'),
           ),
