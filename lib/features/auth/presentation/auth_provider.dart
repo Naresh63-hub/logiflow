@@ -63,10 +63,46 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Login failed. Please check your credentials.',
+        errorMessage: 'Login failed: ${e.toString().replaceAll("Exception:", "").trim()}',
       );
       return false;
     }
+  }
+
+  Future<String?> signUp({
+    required String email,
+    required String password,
+    required String fullName,
+    required String phone,
+    required UserRole role,
+  }) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      final user = await _repository.signUp(
+        email: email,
+        password: password,
+        fullName: fullName,
+        phone: phone,
+        role: role,
+      );
+      if (user != null) {
+        state = state.copyWith(user: user, isLoading: false);
+        return 'SIGNED_IN';
+      } else {
+        state = state.copyWith(isLoading: false);
+        return 'CONFIRM_EMAIL';
+      }
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Sign up failed: ${e.toString().replaceAll("Exception:", "").trim()}',
+      );
+      return null;
+    }
+  }
+
+  Future<void> resetPassword(String email) async {
+    await _repository.resetPassword(email);
   }
 
   Future<void> updateProfile(String fullName, String phone) async {

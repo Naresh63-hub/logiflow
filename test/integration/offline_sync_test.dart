@@ -11,7 +11,7 @@ void main() {
       // Step 1: Simulate offline shipment manifestation
       final shipment = ShipmentModel(
         id: 'sim-ship-001',
-        trackingNumber: 'YUV-2026-77001',
+        trackingNumber: 'LGF-2026-77001',
         senderId: 'user-001',
         senderName: 'Amit Sharma',
         senderPhone: '+91 98712 34567',

@@ -1,7 +1,9 @@
 import 'dart:math';
 import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/database/app_database.dart';
+import '../../../core/network/supabase_config.dart';
 import '../../../core/sync/sync_engine.dart';
 import '../../../core/sync/sync_operation.dart';
 import '../../delivery/domain/pod_model.dart';
@@ -14,8 +16,12 @@ class ShipmentRepository {
 
   ShipmentRepository(this._db, this._syncEngine);
 
-  /// Seeds realistic initial Noida logistics shipments if SQLite is empty
+  /// Seeds realistic initial Noida logistics shipments if SQLite is empty in demo mode
   Future<void> seedIfEmpty() async {
+    if (SupabaseConfig.isRealBackendConfigured) {
+      await pullFromRemote();
+      return;
+    }
     final count = await _db.select(_db.shipments).get();
     if (count.isNotEmpty) return;
 
@@ -24,7 +30,7 @@ class ShipmentRepository {
     final seedShipments = [
       ShipmentModel(
         id: '00000001-0000-0000-0000-000000000001',
-        trackingNumber: 'YUV-2026-88401',
+        trackingNumber: 'LGF-2026-88401',
         senderId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
         senderName: 'Amit Sharma',
         senderPhone: '+91 98712 34567',
@@ -46,7 +52,7 @@ class ShipmentRepository {
       ),
       ShipmentModel(
         id: '00000002-0000-0000-0000-000000000002',
-        trackingNumber: 'YUV-2026-88402',
+        trackingNumber: 'LGF-2026-88402',
         senderId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
         senderName: 'Amit Sharma',
         senderPhone: '+91 98712 34567',
@@ -68,7 +74,7 @@ class ShipmentRepository {
       ),
       ShipmentModel(
         id: '00000003-0000-0000-0000-000000000003',
-        trackingNumber: 'YUV-2026-88403',
+        trackingNumber: 'LGF-2026-88403',
         senderId: 'dddddddd-dddd-dddd-dddd-dddddddddddd',
         senderName: 'Priya Verma',
         senderPhone: '+91 98111 87654',
@@ -89,7 +95,7 @@ class ShipmentRepository {
       ),
       ShipmentModel(
         id: '00000004-0000-0000-0000-000000000004',
-        trackingNumber: 'YUV-2026-88404',
+        trackingNumber: 'LGF-2026-88404',
         senderId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
         senderName: 'Amit Sharma',
         senderPhone: '+91 98712 34567',
@@ -110,7 +116,7 @@ class ShipmentRepository {
       ),
       ShipmentModel(
         id: '00000005-0000-0000-0000-000000000005',
-        trackingNumber: 'YUV-2026-88405',
+        trackingNumber: 'LGF-2026-88405',
         senderId: 'dddddddd-dddd-dddd-dddd-dddddddddddd',
         senderName: 'Priya Verma',
         senderPhone: '+91 98111 87654',
@@ -131,7 +137,7 @@ class ShipmentRepository {
       ),
       ShipmentModel(
         id: '00000006-0000-0000-0000-000000000006',
-        trackingNumber: 'YUV-2026-88406',
+        trackingNumber: 'LGF-2026-88406',
         senderId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
         senderName: 'Amit Sharma',
         senderPhone: '+91 98712 34567',
@@ -152,7 +158,7 @@ class ShipmentRepository {
       ),
       ShipmentModel(
         id: '00000007-0000-0000-0000-000000000007',
-        trackingNumber: 'YUV-2026-88407',
+        trackingNumber: 'LGF-2026-88407',
         senderId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
         senderName: 'Amit Sharma',
         senderPhone: '+91 98712 34567',
@@ -178,7 +184,7 @@ class ShipmentRepository {
       await _insertShipmentIntoLocalDb(s);
     }
 
-    // Seed events for YUV-2026-88401
+    // Seed events for LGF-2026-88401
     await _db.into(_db.shipmentEvents).insert(
           ShipmentEventsCompanion.insert(
             id: '10000001-0000-0000-0000-000000000001',
@@ -239,13 +245,13 @@ class ShipmentRepository {
           ),
         );
 
-    // Seed Proof of Delivery for YUV-2026-88401
+    // Seed Proof of Delivery for LGF-2026-88401
     await _db.into(_db.proofOfDeliveries).insert(
           ProofOfDeliveriesCompanion.insert(
             id: '55555555-5555-5555-5555-555555555555',
             shipmentId: '00000001-0000-0000-0000-000000000001',
             receiverName: 'Sunil Mehra',
-            signaturePath: const Value('https://raw.githubusercontent.com/yuvaintern/logistics-assets/main/sample_signature.png'),
+            signaturePath: const Value('local_verified_signature'),
             photoPath: const Value('https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=500'),
             deliveryLatitude: 28.5708,
             deliveryLongitude: 77.3259,
@@ -285,6 +291,82 @@ class ShipmentRepository {
             updatedAt: s.updatedAt,
           ),
         );
+  }
+
+  /// Pulls live shipments, events, and PODs from Supabase into local Drift SQLite
+  Future<void> pullFromRemote() async {
+    final supabase = SupabaseConfig.client;
+    if (supabase == null || !SupabaseConfig.isRealBackendConfigured) return;
+
+    try {
+      final remoteRows = await supabase
+          .from('shipments')
+          .select()
+          .order('created_at', ascending: false)
+          .limit(100);
+
+      for (final row in remoteRows) {
+        final remoteShipment = ShipmentModel.fromJson(row);
+        final localExisting = await (_db.select(_db.shipments)
+              ..where((tbl) => tbl.id.equals(remoteShipment.id)))
+            .getSingleOrNull();
+
+        // Do not overwrite local unsynced mutations before SyncEngine reconciles them
+        if (localExisting == null || !localExisting.isDirty) {
+          await _insertShipmentIntoLocalDb(remoteShipment);
+        }
+      }
+
+      final remoteEvents = await supabase
+          .from('shipment_events')
+          .select()
+          .order('created_at', ascending: false)
+          .limit(200);
+
+      for (final ev in remoteEvents) {
+        await _db.into(_db.shipmentEvents).insertOnConflictUpdate(
+              ShipmentEventsCompanion.insert(
+                id: ev['id'] as String,
+                shipmentId: ev['shipment_id'] as String,
+                previousStatus: Value(ev['previous_status'] as String?),
+                newStatus: ev['new_status'] as String,
+                locationName: ev['location_name'] as String,
+                latitude: Value((ev['latitude'] as num?)?.toDouble()),
+                longitude: Value((ev['longitude'] as num?)?.toDouble()),
+                remarks: Value(ev['remarks'] as String?),
+                updatedBy: ev['updated_by'] as String,
+                createdAt: DateTime.parse(ev['created_at'] as String),
+              ),
+            );
+      }
+
+      final remotePods = await supabase
+          .from('proof_of_deliveries')
+          .select()
+          .order('created_at', ascending: false)
+          .limit(100);
+
+      for (final p in remotePods) {
+        await _db.into(_db.proofOfDeliveries).insertOnConflictUpdate(
+              ProofOfDeliveriesCompanion.insert(
+                id: p['id'] as String,
+                shipmentId: p['shipment_id'] as String,
+                receiverName: p['receiver_name'] as String,
+                signaturePath: Value(p['signature_url'] as String?),
+                photoPath: Value(p['photo_url'] as String?),
+                deliveryLatitude: (p['delivery_latitude'] as num).toDouble(),
+                deliveryLongitude: (p['delivery_longitude'] as num).toDouble(),
+                deliveryTimestamp: DateTime.parse(p['delivery_timestamp'] as String),
+                notes: Value(p['notes'] as String?),
+                submittedBy: p['submitted_by'] as String,
+                syncStatus: Value(p['sync_status'] as String? ?? 'synced'),
+                createdAt: DateTime.parse(p['created_at'] as String),
+              ),
+            );
+      }
+    } catch (e) {
+      debugPrint('[ShipmentRepository] pullFromRemote warning: $e');
+    }
   }
 
   Stream<List<ShipmentModel>> watchShipments({
@@ -404,7 +486,7 @@ class ShipmentRepository {
   }) async {
     final id = _uuid.v4();
     final randomDigits = 10000 + Random().nextInt(90000);
-    final trackingNumber = 'YUV-2026-$randomDigits';
+    final trackingNumber = 'LGF-2026-$randomDigits';
     final now = DateTime.now();
 
     final shipment = ShipmentModel(

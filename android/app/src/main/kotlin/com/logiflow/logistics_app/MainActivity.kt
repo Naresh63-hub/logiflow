@@ -1,4 +1,4 @@
-package com.yuvaintern.logistics.logistics_app
+package com.logiflow.logistics_app
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/localization/app_localizations.dart';
+import '../../../core/network/supabase_config.dart';
 import '../../../core/sync/sync_engine.dart';
+import '../../shipments/presentation/shipments_provider.dart';
 import 'settings_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -16,7 +18,7 @@ class SettingsScreen extends ConsumerWidget {
         title: const Text('Privacy & Security Policy'),
         content: const SingleChildScrollView(
           child: Text(
-            'LogiFlow Yuva 3PL System complies with enterprise logistics confidentiality standards.\n\n'
+            'LogiFlow 3PL System complies with enterprise logistics confidentiality standards.\n\n'
             '1. Data Integrity: Consignment tracking and recipient phone numbers are encrypted in transit and at rest.\n'
             '2. Proof of Delivery: Digital signatures and delivery photographs are stored securely and never modified once verified.\n'
             '3. Offline Synchronization: Local changes are stored strictly within the app sandbox SQLite database and transmitted over TLS.\n'
@@ -222,6 +224,19 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
+                    SupabaseConfig.isRealBackendConfigured
+                        ? 'Cloud Backend: Connected (${SupabaseConfig.url})'
+                        : 'Cloud Backend: Offline SQLite Evaluation Mode',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: SupabaseConfig.isRealBackendConfigured
+                          ? AppColors.success
+                          : AppColors.textSecondaryLight,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
                     syncState.lastSyncTime != null
                         ? 'Last Sync: ${dateFormat.format(syncState.lastSyncTime!)}'
                         : 'Last Sync: None in this session',
@@ -233,6 +248,8 @@ class SettingsScreen extends ConsumerWidget {
                         ? null
                         : () async {
                             await ref.read(syncEngineProvider.notifier).syncNow();
+                            await ref.read(shipmentRepositoryProvider).pullFromRemote();
+                            ref.invalidate(shipmentsStreamProvider);
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(content: Text('Manual synchronization completed.')),
@@ -266,8 +283,8 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.school_outlined, color: AppColors.accent),
-                  title: const Text('Internship Organization'),
+                  leading: const Icon(Icons.business_outlined, color: AppColors.accent),
+                  title: const Text('Organization'),
                   subtitle: Text(context.tr('developerCredit')),
                 ),
                 const Divider(height: 1),

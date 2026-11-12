@@ -1,6 +1,6 @@
 -- ====================================================================
--- YUVA LOGISTICS (3PL) SEED DATA (Noida NCR Operational Hub)
--- Project: LogiFlow Yuva
+-- LOGIFLOW LOGISTICS (3PL) SEED DATA (Noida NCR Operational Hub)
+-- Project: LogiFlow
 -- ====================================================================
 
 -- 1. HUBS SEED
@@ -10,13 +10,26 @@ INSERT INTO public.hubs (id, code, name, city, state, address, latitude, longitu
 ('33333333-3333-3333-3333-333333333333', 'HUB-OKH-03', 'Okhla NCR Gateway Distribution Center', 'New Delhi', 'Delhi', 'Phase 3, Okhla Industrial Estate, New Delhi 110020', 28.5284, 77.2755, '+91 11 2684 1234')
 ON CONFLICT (id) DO NOTHING;
 
--- 2. DEMO PROFILES (Auth users mock references)
-INSERT INTO public.profiles (id, full_name, email, phone, role, hub_id, avatar_url) VALUES
-('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Amit Sharma', 'shipper@yuvaintern.com', '+91 98712 34567', 'shipper', NULL, 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'),
-('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Rajesh Kumar', 'manager@yuvaintern.com', '+91 98101 23456', 'hub_manager', '11111111-1111-1111-1111-111111111111', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150'),
-('cccccccc-cccc-cccc-cccc-cccccccccccc', 'Vikas Singh', 'driver@yuvaintern.com', '+91 99580 98765', 'driver', '11111111-1111-1111-1111-111111111111', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150'),
-('dddddddd-dddd-dddd-dddd-dddddddddddd', 'Priya Verma', 'priya.shipper@logistics.in', '+91 98111 87654', 'shipper', NULL, 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150')
+-- 2. DEMO AUTH & PROFILES (Placeholder auth references with no active password; create real logins via Sign Up)
+INSERT INTO auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
+VALUES
+('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'shipper@logiflow.in', '', NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Amit Sharma","role":"shipper"}', NOW(), NOW()),
+('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'manager@logiflow.in', '', NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Rajesh Kumar","role":"hub_manager"}', NOW(), NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccccc', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'driver@logiflow.in', '', NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Vikas Singh","role":"driver"}', NOW(), NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddddd', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'priya.shipper@logistics.in', '', NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Priya Verma","role":"shipper"}', NOW(), NOW())
 ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public.profiles (id, full_name, email, phone, role, hub_id, avatar_url) VALUES
+('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Amit Sharma', 'shipper@logiflow.in', '+91 98712 34567', 'shipper', NULL, 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'),
+('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Rajesh Kumar', 'manager@logiflow.in', '+91 98101 23456', 'hub_manager', '11111111-1111-1111-1111-111111111111', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150'),
+('cccccccc-cccc-cccc-cccc-cccccccccccc', 'Vikas Singh', 'driver@logiflow.in', '+91 99580 98765', 'driver', '11111111-1111-1111-1111-111111111111', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150'),
+('dddddddd-dddd-dddd-dddd-dddddddddddd', 'Priya Verma', 'priya.shipper@logistics.in', '+91 98111 87654', 'shipper', NULL, 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150')
+ON CONFLICT (id) DO UPDATE SET
+    full_name = EXCLUDED.full_name,
+    phone = EXCLUDED.phone,
+    role = EXCLUDED.role,
+    hub_id = EXCLUDED.hub_id,
+    avatar_url = EXCLUDED.avatar_url;
 
 -- 3. SHIPMENTS SEED (Realistic Noida Logistics Lifecycle & Edge Cases)
 INSERT INTO public.shipments (
@@ -28,7 +41,7 @@ INSERT INTO public.shipments (
 -- 1. Delivered with Complete POD (GPS Sector 18 Noida)
 (
     '00000001-0000-0000-0000-000000000001',
-    'YUV-2026-88401',
+    'LGF-2026-88401',
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
     'Amit Sharma',
     '+91 98712 34567',
@@ -49,7 +62,7 @@ INSERT INTO public.shipments (
 -- 2. Out for Delivery (Live in Greater Noida West)
 (
     '00000002-0000-0000-0000-000000000002',
-    'YUV-2026-88402',
+    'LGF-2026-88402',
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
     'Amit Sharma',
     '+91 98712 34567',
@@ -70,7 +83,7 @@ INSERT INTO public.shipments (
 -- 3. In Transit (Between Noida Hub and Okhla Hub)
 (
     '00000003-0000-0000-0000-000000000003',
-    'YUV-2026-88403',
+    'LGF-2026-88403',
     'dddddddd-dddd-dddd-dddd-dddddddddddd',
     'Priya Verma',
     '+91 98111 87654',
@@ -91,7 +104,7 @@ INSERT INTO public.shipments (
 -- 4. Arrived at Hub (Noida Sector 62)
 (
     '00000004-0000-0000-0000-000000000004',
-    'YUV-2026-88404',
+    'LGF-2026-88404',
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
     'Amit Sharma',
     '+91 98712 34567',
@@ -112,7 +125,7 @@ INSERT INTO public.shipments (
 -- 5. Picked Up (From Merchant Warehouse)
 (
     '00000005-0000-0000-0000-000000000005',
-    'YUV-2026-88405',
+    'LGF-2026-88405',
     'dddddddd-dddd-dddd-dddd-dddddddddddd',
     'Priya Verma',
     '+91 98111 87654',
@@ -133,7 +146,7 @@ INSERT INTO public.shipments (
 -- 6. Pickup Scheduled
 (
     '00000006-0000-0000-0000-000000000006',
-    'YUV-2026-88406',
+    'LGF-2026-88406',
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
     'Amit Sharma',
     '+91 98712 34567',
@@ -154,7 +167,7 @@ INSERT INTO public.shipments (
 -- 7. Delivery Failed (Edge case: Locked gate / recipient unavailable)
 (
     '00000007-0000-0000-0000-000000000007',
-    'YUV-2026-88407',
+    'LGF-2026-88407',
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
     'Amit Sharma',
     '+91 98712 34567',
@@ -175,7 +188,7 @@ INSERT INTO public.shipments (
 -- 8. Created (Edge case: Very long description & offline sync prototype)
 (
     '00000008-0000-0000-0000-000000000008',
-    'YUV-2026-88408',
+    'LGF-2026-88408',
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
     'Amit Sharma',
     '+91 98712 34567',
@@ -197,23 +210,23 @@ ON CONFLICT (id) DO NOTHING;
 
 -- 4. TIMELINE EVENTS SEED
 INSERT INTO public.shipment_events (id, shipment_id, previous_status, new_status, location_name, latitude, longitude, remarks, updated_by, created_at) VALUES
--- Events for YUV-2026-88401 (Delivered)
+-- Events for LGF-2026-88401 (Delivered)
 ('10000001-0000-0000-0000-000000000001', '00000001-0000-0000-0000-000000000001', NULL, 'created', 'ATS One Hamlet, Sector 104, Noida', 28.5355, 77.3752, 'Shipment order booked via Mobile App', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', NOW() - INTERVAL '26 hours'),
 ('10000001-0000-0000-0000-000000000002', '00000001-0000-0000-0000-000000000001', 'created', 'picked_up', 'Sector 104, Noida', 28.5355, 77.3752, 'Package picked up by courier van 14', 'cccccccc-cccc-cccc-cccc-cccccccccccc', NOW() - INTERVAL '20 hours'),
 ('10000001-0000-0000-0000-000000000003', '00000001-0000-0000-0000-000000000001', 'picked_up', 'arrived_at_hub', 'Noida Sector 62 Central Hub', 28.6280, 77.3649, 'Sorted at Sector 62 Central Conveyor', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', NOW() - INTERVAL '14 hours'),
 ('10000001-0000-0000-0000-000000000004', '00000001-0000-0000-0000-000000000001', 'arrived_at_hub', 'out_for_delivery', 'Wave Silver Tower, Sector 18', 28.5708, 77.3259, 'Assigned to driver Vikas Singh for final mile', 'cccccccc-cccc-cccc-cccc-cccccccccccc', NOW() - INTERVAL '6 hours'),
 ('10000001-0000-0000-0000-000000000005', '00000001-0000-0000-0000-000000000001', 'out_for_delivery', 'delivered', 'Wave Silver Tower, Sector 18, Noida', 28.5708, 77.3259, 'Delivered to Sunil Mehra with digital signature & photo', 'cccccccc-cccc-cccc-cccc-cccccccccccc', NOW() - INTERVAL '4 hours'),
 
--- Events for YUV-2026-88402 (Out for delivery)
+-- Events for LGF-2026-88402 (Out for delivery)
 ('10000002-0000-0000-0000-000000000001', '00000002-0000-0000-0000-000000000002', NULL, 'created', 'C-24, Sector 65, Noida', 28.6180, 77.3820, 'Shipment manifested', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', NOW() - INTERVAL '16 hours'),
 ('10000002-0000-0000-0000-000000000002', '00000002-0000-0000-0000-000000000002', 'created', 'arrived_at_hub', 'Noida Sector 62 Central Hub', 28.6280, 77.3649, 'Inbound scanned at Hub 01', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', NOW() - INTERVAL '10 hours'),
 ('10000002-0000-0000-0000-000000000003', '00000002-0000-0000-0000-000000000002', 'arrived_at_hub', 'out_for_delivery', 'Greater Noida West Route', 28.5833, 77.4450, 'Out for delivery with Vikas Singh', 'cccccccc-cccc-cccc-cccc-cccccccccccc', NOW() - INTERVAL '2 hours'),
 
--- Events for YUV-2026-88407 (Delivery Failed)
+-- Events for LGF-2026-88407 (Delivery Failed)
 ('10000007-0000-0000-0000-000000000001', '00000007-0000-0000-0000-000000000007', 'out_for_delivery', 'delivery_failed', 'Atta Market, Sector 27, Noida', 28.5720, 77.3290, 'Customer premise closed / shop shutter locked. Re-attempt scheduled tomorrow.', 'cccccccc-cccc-cccc-cccc-cccccccccccc', NOW() - INTERVAL '2 hours')
 ON CONFLICT (id) DO NOTHING;
 
--- 5. PROOF OF DELIVERY SEED (For YUV-2026-88401)
+-- 5. PROOF OF DELIVERY SEED (For LGF-2026-88401)
 INSERT INTO public.proof_of_deliveries (
     id, shipment_id, receiver_name, signature_url, photo_url,
     delivery_latitude, delivery_longitude, delivery_timestamp, notes, submitted_by, sync_status, is_verified
@@ -221,7 +234,7 @@ INSERT INTO public.proof_of_deliveries (
     '55555555-5555-5555-5555-555555555555',
     '00000001-0000-0000-0000-000000000001',
     'Sunil Mehra',
-    'https://raw.githubusercontent.com/yuvaintern/logistics-assets/main/sample_signature.png',
+    'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=300',
     'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=500',
     28.5708,
     77.3259,

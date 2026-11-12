@@ -8,10 +8,10 @@ class AuthRepository {
 
   AuthRepository(this._db);
 
-  // Pre-configured Demo Users for evaluation & offline demonstrations
+  // Pre-configured Demo Users for offline evaluation without live Supabase credentials
   static const UserModel demoShipper = UserModel(
     id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
-    email: 'shipper@yuvaintern.com',
+    email: 'shipper@logiflow.in',
     fullName: 'Amit Sharma',
     phone: '+91 98712 34567',
     role: UserRole.shipper,
@@ -20,7 +20,7 @@ class AuthRepository {
 
   static const UserModel demoHubManager = UserModel(
     id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
-    email: 'manager@yuvaintern.com',
+    email: 'manager@logiflow.in',
     fullName: 'Rajesh Kumar',
     phone: '+91 98101 23456',
     role: UserRole.hubManager,
@@ -32,7 +32,47 @@ class AuthRepository {
     required String email,
     required String password,
   }) async {
-    // 1. Check for quick demo credentials
+    final supabase = SupabaseConfig.client;
+
+    // 1. Live Supabase Authentication when backend is configured
+    if (supabase != null && SupabaseConfig.isRealBackendConfigured) {
+      final res = await supabase.auth.signInWithPassword(
+        email: email.trim(),
+        password: password,
+      );
+      if (res.user == null) {
+        throw Exception('Invalid Supabase credentials');
+      }
+
+      final profileData = await supabase
+          .from('profiles')
+          .select()
+          .eq('id', res.user!.id)
+          .maybeSingle();
+
+      if (profileData != null) {
+        final user = UserModel.fromJson(profileData);
+        await _cacheUser(user);
+        return user;
+      }
+
+      // Create profile fallback if trigger wasn't executed yet
+      final meta = res.user!.userMetadata ?? {};
+      final newRole = UserRole.fromString(meta['role'] as String? ?? 'shipper');
+      final fallback = UserModel(
+        id: res.user!.id,
+        email: res.user!.email ?? email.trim(),
+        fullName: meta['full_name'] as String? ?? email.split('@').first,
+        phone: meta['phone'] as String? ?? '+91 98000 00000',
+        role: newRole,
+        hubId: newRole == UserRole.hubManager ? '11111111-1111-1111-1111-111111111111' : null,
+      );
+      await supabase.from('profiles').upsert(fallback.toJson());
+      await _cacheUser(fallback);
+      return fallback;
+    }
+
+    // 2. Offline Demo Fallback Mode (no Supabase project configured)
     if (email.trim().toLowerCase() == demoShipper.email) {
       await _cacheUser(demoShipper);
       return demoShipper;
@@ -42,29 +82,6 @@ class AuthRepository {
       return demoHubManager;
     }
 
-    // 2. If live Supabase is configured, authenticate with Supabase Auth
-    final supabase = SupabaseConfig.client;
-    if (supabase != null && SupabaseConfig.isRealBackendConfigured) {
-      final res = await supabase.auth.signInWithPassword(
-        email: email.trim(),
-        password: password,
-      );
-      if (res.user != null) {
-        final profileData = await supabase
-            .from('profiles')
-            .select()
-            .eq('id', res.user!.id)
-            .maybeSingle();
-
-        if (profileData != null) {
-          final user = UserModel.fromJson(profileData);
-          await _cacheUser(user);
-          return user;
-        }
-      }
-    }
-
-    // 3. Fallback demo user for arbitrary valid login
     final fallbackUser = UserModel(
       id: 'demo-user-${email.hashCode}',
       email: email.trim(),
@@ -75,6 +92,66 @@ class AuthRepository {
     );
     await _cacheUser(fallbackUser);
     return fallbackUser;
+  }
+
+  Future<UserModel?> signUp({
+    required String email,
+    required String password,
+    required String fullName,
+    required String phone,
+    required UserRole role,
+  }) async {
+    final supabase = SupabaseConfig.client;
+    if (supabase != null && SupabaseConfig.isRealBackendConfigured) {
+      final res = await supabase.auth.signUp(
+        email: email.trim(),
+        password: password,
+        data: {
+          'full_name': fullName.trim(),
+          'phone': phone.trim(),
+          'role': role.toDbString(),
+        },
+      );
+      if (res.user == null) {
+        throw Exception('Account creation failed');
+      }
+
+      // If email confirmation is disabled in Supabase, session is active immediately
+      if (res.session != null) {
+        final user = UserModel(
+          id: res.user!.id,
+          email: email.trim(),
+          fullName: fullName.trim(),
+          phone: phone.trim(),
+          role: role,
+          hubId: role == UserRole.hubManager ? '11111111-1111-1111-1111-111111111111' : null,
+        );
+        await supabase.from('profiles').upsert(user.toJson());
+        await _cacheUser(user);
+        return user;
+      }
+      // Return null to signify email confirmation check is required before login
+      return null;
+    }
+
+    // Offline Demo Sign Up
+    final offlineUser = UserModel(
+      id: 'demo-user-${email.hashCode}',
+      email: email.trim(),
+      fullName: fullName.trim(),
+      phone: phone.trim(),
+      role: role,
+      hubId: role == UserRole.hubManager ? '11111111-1111-1111-1111-111111111111' : null,
+    );
+    await _cacheUser(offlineUser);
+    return offlineUser;
+  }
+
+  Future<void> resetPassword(String email) async {
+    final supabase = SupabaseConfig.client;
+    if (supabase != null && SupabaseConfig.isRealBackendConfigured) {
+      await supabase.auth.resetPasswordForEmail(email.trim());
+    }
   }
 
   Future<void> _cacheUser(UserModel user) async {

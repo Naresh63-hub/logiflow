@@ -1,4 +1,4 @@
-# LogiFlow Yuva — System Architecture & Technical Design
+# LogiFlow — System Architecture & Technical Design
 
 ## 1. Feature-First Clean Architecture
 
@@ -56,7 +56,7 @@ sequenceDiagram
     SyncEngine->>LocalDB: Mark SyncQueue = 'synced' & Clear isDirty
 ```
 
-### Conflict Resolution Rules Implemented in [`ConflictResolver`](file:///d:/yuva/lib/core/sync/conflict_resolver.dart):
+### Conflict Resolution Rules Implemented in [`ConflictResolver`](../lib/core/sync/conflict_resolver.dart):
 
 1. **Proof of Delivery Evidence Preservation Rule (`SUBMIT_POD`)**:
    - **Never Overwrite Delivery Evidence**: If a driver submits a digital signature, photo, and GPS coordinates while offline and another hub manager updates the shipment status concurrently, the server version diverges.

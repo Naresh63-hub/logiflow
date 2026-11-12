@@ -6,7 +6,7 @@ import 'package:logistics_app/core/database/app_database.dart';
 import 'package:logistics_app/core/database/database_provider.dart';
 
 void main() {
-  testWidgets('LogiFlow Yuva App boots successfully into initial route', (WidgetTester tester) async {
+  testWidgets('LogiFlow App boots successfully into initial route', (WidgetTester tester) async {
     final db = AppDatabase(NativeDatabase.memory());
 
     await tester.pumpWidget(

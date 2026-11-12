@@ -1,4 +1,4 @@
-name: LogiFlow Yuva - Flutter CI/CD Pipeline
+name: LogiFlow - Flutter CI/CD Pipeline
 
 on:
   push:
@@ -68,5 +68,5 @@ jobs:
       - name: Upload APK Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: logiflow-yuva-release-apks
+          name: logiflow-release-apks
           path: build/app/outputs/flutter-apk/*.apk

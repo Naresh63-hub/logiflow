@@ -64,9 +64,11 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
 
     final demoShipperButton = find.text('Demo Shipper (Quick Fill)');
+    await tester.ensureVisible(demoShipperButton);
+    await tester.pumpAndSettle();
     await tester.tap(demoShipperButton);
     await tester.pumpAndSettle();
 
-    expect(find.text('shipper@yuvaintern.com'), findsOneWidget);
+    expect(find.text('shipper@logiflow.in'), findsOneWidget);
   });
 }

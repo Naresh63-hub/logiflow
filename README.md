@@ -1,6 +1,6 @@
-# LogiFlow Yuva — Production Cross-Platform 3PL Logistics & Proof-of-Delivery System
+# LogiFlow — Production Cross-Platform 3PL Logistics & Proof-of-Delivery System
 
-[![Flutter CI](https://github.com/yuvaintern/logiflow-yuva/actions/workflows/ci.yml/badge.svg)](https://github.com/yuvaintern/logiflow-yuva/actions/workflows/ci.yml)
+[![Flutter CI](https://github.com/logiflow/logiflow-app/actions/workflows/ci.yml/badge.svg)](https://github.com/logiflow/logiflow-app/actions/workflows/ci.yml)
 [![Flutter 3.47](https://img.shields.io/badge/Flutter-3.47.8-02569B?logo=flutter)](https://flutter.dev)
 [![Dart 3.13](https://img.shields.io/badge/Dart-3.13.7-0175C2?logo=dart)](https://dart.dev)
 [![Supabase](https://img.shields.io/badge/Backend-Supabase%20PostgreSQL-3ECF8E?logo=supabase)](https://supabase.com)
@@ -8,15 +8,13 @@
 
 A production-grade, **offline-first** cross-platform Third-Party Logistics (3PL) shipment tracking and Proof-of-Delivery (POD) mobile application built in Flutter for regional operations centered around **Noida, Uttar Pradesh, India** (Sector 62 Hub, Greater Noida West Fulfillment Hub, and Okhla NCR Gateway).
 
-Developed as a capstone deliverable for the **YuvaIntern – Mobile App Development Fresher** program.
-
 ---
 
 ## Key Capabilities & Role-Based Workflows
 
 ### Shipper Role
 - **Shipper Dashboard**: Real-time summary cards (Total, In-Transit, Delivered, Pending, Delayed) with status distribution.
-- **Create Consignments**: Full multi-section manifest form with weight, category, priority tiers (Standard, Express, Overnight), and automated `YUV-2026-XXXXX` tracking generation.
+- **Create Consignments**: Full multi-section manifest form with weight, category, priority tiers (Standard, Express, Overnight), and automated `LGF-2026-XXXXX` tracking generation.
 - **Shipment Tracking & Timeline**: Live event timeline displaying every scan, hub arrival, dispatch, and exception remark.
 - **Proof of Delivery Viewer**: View receiver signature, delivery photo, GPS coordinates, and timestamp once delivered.
 
@@ -109,8 +107,8 @@ Normalized schema migrations and Noida seed data are located in `supabase/`:
 
 1. **Clone & Install Dependencies**:
    ```bash
-   git clone https://github.com/yuvaintern/logiflow-yuva.git
-   cd logiflow-yuva
+   git clone https://github.com/logiflow/logiflow-app.git
+   cd logiflow-app
    flutter pub get
    ```
 
@@ -132,8 +130,8 @@ Normalized schema migrations and Noida seed data are located in `supabase/`:
    ```
 
 5. **Demo Evaluation Accounts** (available on the Login screen via one-tap quick-fill):
-   - **Shipper**: `shipper@yuvaintern.com`
-   - **Hub Manager**: `manager@yuvaintern.com`
+   - **Shipper**: `shipper@logiflow.in`
+   - **Hub Manager**: `manager@logiflow.in`
 
 ---
 

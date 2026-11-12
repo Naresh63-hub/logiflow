@@ -8,7 +8,7 @@
 PRODUCT_NAME = logistics_app
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.yuvaintern.logistics.logisticsApp
+PRODUCT_BUNDLE_IDENTIFIER = com.logiflow.logisticsApp
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2026 com.yuvaintern.logistics. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2026 com.logiflow.logistics. All rights reserved.

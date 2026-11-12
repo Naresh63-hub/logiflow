@@ -14,7 +14,7 @@ class LogisticsApp extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
 
     return MaterialApp.router(
-      title: 'LogiFlow Yuva',
+      title: 'LogiFlow',
       debugShowCheckedModeBanner: false,
       routerConfig: appRouter,
       theme: AppTheme.lightTheme,

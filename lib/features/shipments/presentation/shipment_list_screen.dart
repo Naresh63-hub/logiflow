@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/localization/app_localizations.dart';
+import '../../../core/sync/sync_engine.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/loading_skeleton.dart';
 import '../../../shared/widgets/offline_banner.dart';
@@ -139,6 +140,8 @@ class _ShipmentListScreenState extends ConsumerState<ShipmentListScreen> {
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {
+                await ref.read(syncEngineProvider.notifier).syncNow();
+                await ref.read(shipmentRepositoryProvider).pullFromRemote();
                 ref.invalidate(shipmentsStreamProvider);
                 setState(() => _visibleCount = _pageSize);
               },

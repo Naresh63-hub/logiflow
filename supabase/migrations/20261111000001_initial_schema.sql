@@ -1,6 +1,6 @@
 -- ====================================================================
--- YUVA LOGISTICS (3PL) SCHEMA MIGRATION
--- Project: LogiFlow Yuva - Production Cross-Platform Shipment System
+-- LOGIFLOW LOGISTICS (3PL) SCHEMA MIGRATION
+-- Project: LogiFlow - Production Cross-Platform Shipment System
 -- Generated: 2026-11-11
 -- ====================================================================
 

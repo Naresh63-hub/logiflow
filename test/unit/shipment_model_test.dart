@@ -7,7 +7,7 @@ void main() {
 
     final testShipment = ShipmentModel(
       id: 'test-uuid-001',
-      trackingNumber: 'YUV-2026-99001',
+      trackingNumber: 'LGF-2026-99001',
       senderId: 'user-001',
       senderName: 'Amit Sharma',
       senderPhone: '+91 98712 34567',
@@ -29,7 +29,7 @@ void main() {
 
     test('ShipmentModel JSON serialization roundtrip maintains field integrity', () {
       final json = testShipment.toJson();
-      expect(json['tracking_number'], 'YUV-2026-99001');
+      expect(json['tracking_number'], 'LGF-2026-99001');
       expect(json['weight_kg'], 2.5);
       expect(json['current_status'], 'in_transit');
       expect(json['priority'], 'express');

@@ -71,7 +71,7 @@ def build_report(output_path):
     # Title Page
     p_org = doc.add_paragraph()
     p_org.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r_org = p_org.add_run("YUVAINTERN – MOBILE APP DEVELOPMENT FRESHER\nCAPSTONE PROJECT REPORT")
+    r_org = p_org.add_run("LOGIFLOW ENTERPRISE 3PL\nTECHNICAL ARCHITECTURE & PROJECT REPORT")
     r_org.bold = True
     r_org.font.size = Pt(14)
     r_org.font.color.rgb = RGBColor(0xFF, 0x65, 0x00)  # Safety Orange
@@ -80,7 +80,7 @@ def build_report(output_path):
 
     p_title = doc.add_paragraph()
     p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r_title = p_title.add_run("LogiFlow Yuva\nProduction-Style Cross-Platform Shipment Tracking &\nProof-of-Delivery System")
+    r_title = p_title.add_run("LogiFlow\nProduction-Style Cross-Platform Shipment Tracking &\nProof-of-Delivery System")
     r_title.bold = True
     r_title.font.size = Pt(22)
     r_title.font.color.rgb = RGBColor(0x0B, 0x19, 0x2C)
@@ -103,11 +103,11 @@ def build_report(output_path):
     add_heading_styled(doc, "1. Introduction", level=1)
     add_body(
         doc,
-        "LogiFlow Yuva is a cross-platform mobile logistics management application engineered for a fictional Third-Party Logistics (3PL) enterprise operating out of Noida, Uttar Pradesh, India. Serving key regional distribution corridors including the Noida Sector 62 Central Hub, Greater Noida West Fulfillment Hub, and Okhla NCR Gateway Distribution Center, the system digitizes end-to-end consignment manifestation, hub sorting, barcode identification, live tracking timelines, and tamper-resistant Proof-of-Delivery (POD) verification."
+        "LogiFlow is a cross-platform mobile logistics management application engineered for a Third-Party Logistics (3PL) enterprise operating out of Noida, Uttar Pradesh, India. Serving key regional distribution corridors including the Noida Sector 62 Central Hub, Greater Noida West Fulfillment Hub, and Okhla NCR Gateway Distribution Center, the system digitizes end-to-end consignment manifestation, hub sorting, barcode identification, live tracking timelines, and tamper-resistant Proof-of-Delivery (POD) verification."
     )
     add_body(
         doc,
-        "Unlike static prototypes, LogiFlow Yuva implements a production-style offline-first architecture powered by Drift (SQLite) paired with a normalized Supabase PostgreSQL backend, Row Level Security (RLS), role-based access control, bilingual English/Hindi localization, and an automated optimistic-concurrency synchronization engine."
+        "Unlike static prototypes, LogiFlow implements a production-style offline-first architecture powered by Drift (SQLite) paired with a normalized Supabase PostgreSQL backend, Row Level Security (RLS), role-based access control, bilingual English/Hindi localization, and an automated optimistic-concurrency synchronization engine."
     )
 
     # 2. Problem Statement
@@ -246,7 +246,7 @@ def build_report(output_path):
             ["flutter analyze", "Full Dart codebase, Drift generated DAOs, Riverpod providers & screens", "Passed (0 issues found)"],
             ["test/unit/shipment_model_test.dart", "JSON roundtrips, status & priority enum parsing, helper flags", "4/4 Passed"],
             ["test/unit/conflict_resolver_test.dart", "Version matches, POD evidence preservation, delivered regression guard", "3/3 Passed"],
-            ["test/unit/validation_test.dart", "Email, Indian phone numbers, package weight, YUV-YYYY-XXXXX tracking IDs", "4/4 Passed"],
+            ["test/unit/validation_test.dart", "Email, Indian phone numbers, package weight, LGF-YYYY-XXXXX tracking IDs", "4/4 Passed"],
             ["test/widget/login_screen_test.dart", "Login form rendering & Demo Shipper credential quick-fill", "2/2 Passed"],
             ["test/widget/dashboard_and_screens_test.dart", "ShipmentListScreen search/filter chips & CreateShipmentScreen form cards", "2/2 Passed"],
             ["test/widget_test.dart", "Root LogisticsApp initialization with Drift in-memory database", "1/1 Passed"],
@@ -262,7 +262,7 @@ def build_report(output_path):
     add_heading_styled(doc, "12. Conclusion & Future Enhancements", level=1)
     add_body(
         doc,
-        "LogiFlow Yuva fulfills all architectural, functional, offline-first, security, and testing deliverables for the YuvaIntern Mobile App Development Fresher internship project. It demonstrates clean separation of concerns, resilient local-first engineering, bilingual accessibility, and verifiable conflict handling."
+        "LogiFlow fulfills all architectural, functional, offline-first, security, and testing requirements for an enterprise 3PL mobile deployment. It demonstrates clean separation of concerns, resilient local-first engineering, bilingual accessibility, and verifiable conflict handling."
     )
     add_body(doc, "Planned Future Enhancements:", bold_prefix="Roadmap: ")
     add_bullet(doc, "Live Route Polyline Optimization: ", "Integrate multi-stop TSP route sequencing across Noida & Greater Noida sectors using Google Maps Directions API.")
@@ -274,4 +274,4 @@ def build_report(output_path):
     print(f"Report generated successfully at: {output_path}")
 
 if __name__ == "__main__":
-    build_report("docs/YuvaIntern_Logistics_Mobile_App_Project_Report.docx")
+    build_report("docs/LogiFlow_Project_Report.docx")

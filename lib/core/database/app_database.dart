@@ -101,6 +101,6 @@ class AppDatabase extends _$AppDatabase {
   int get schemaVersion => 1;
 
   static QueryExecutor _openConnection() {
-    return driftDatabase(name: 'logiflow_yuva_db');
+    return driftDatabase(name: 'logiflow_db');
   }
 }

@@ -18,11 +18,11 @@ void main() {
     }
 
     bool isValidTrackingId(String trackingId) {
-      return RegExp(r'^YUV-\d{4}-\d{5}$').hasMatch(trackingId.trim());
+      return RegExp(r'^LGF-\d{4}-\d{5}$').hasMatch(trackingId.trim());
     }
 
     test('Email format validation accepts standard enterprise formats and rejects malformed', () {
-      expect(isValidEmail('shipper@yuvaintern.com'), isTrue);
+      expect(isValidEmail('shipper@logiflow.in'), isTrue);
       expect(isValidEmail('manager.rajesh@noida.logistics.in'), isTrue);
       expect(isValidEmail('invalid-email'), isFalse);
       expect(isValidEmail('@domain.com'), isFalse);
@@ -48,12 +48,12 @@ void main() {
       expect(isValidWeight('25000'), isFalse);
     });
 
-    test('Tracking identifier format validation strictly matches YUV-YYYY-XXXXX standard', () {
-      expect(isValidTrackingId('YUV-2026-88401'), isTrue);
-      expect(isValidTrackingId('YUV-2026-10023'), isTrue);
+    test('Tracking identifier format validation strictly matches LGF-YYYY-XXXXX standard', () {
+      expect(isValidTrackingId('LGF-2026-88401'), isTrue);
+      expect(isValidTrackingId('LGF-2026-10023'), isTrue);
       expect(isValidTrackingId('ABC-2026-88401'), isFalse);
-      expect(isValidTrackingId('YUV-26-88401'), isFalse);
-      expect(isValidTrackingId('YUV-2026-884'), isFalse);
+      expect(isValidTrackingId('LGF-26-88401'), isFalse);
+      expect(isValidTrackingId('LGF-2026-884'), isFalse);
     });
   });
 }

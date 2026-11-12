@@ -21,7 +21,7 @@ class AppLocalizations {
   static final Map<String, Map<String, String>> _localizedValues = {
     'en': {
       // General
-      'appName': 'LogiFlow Yuva',
+      'appName': 'LogiFlow',
       'appTagline': '3PL Shipment Tracking & Proof-of-Delivery System',
       'hubNoida': 'Noida Sector 62 Central Hub',
       'loading': 'Loading...',
@@ -152,9 +152,9 @@ class AppLocalizations {
       'syncStatus': 'Offline Synchronization Queue',
       'pendingOperations': 'Pending Offline Changes',
       'manualSync': 'Trigger Manual Sync',
-      'aboutApp': 'About LogiFlow Yuva',
+      'aboutApp': 'About LogiFlow',
       'appVersion': 'Version 1.0.0 (Build 20261111)',
-      'developerCredit': 'YuvaIntern Logistics Mobile Application',
+      'developerCredit': 'LogiFlow Logistics Systems',
       'privacyPolicy': 'Privacy & Data Security Policy',
       'offlineBanner': 'Offline Mode: Local database active. Changes will auto-sync.',
       'onlineBanner': 'Online: Real-time connection active.',
@@ -169,7 +169,7 @@ class AppLocalizations {
     },
     'hi': {
       // General
-      'appName': 'लॉजिफ़्लो युवा',
+      'appName': 'लॉजिफ़्लो',
       'appTagline': '3PL शिपमेंट ट्रैकिंग एवं डिलीवरी प्रमाण प्रणाली',
       'hubNoida': 'नोएडा सेक्टर 62 मुख्य हब',
       'loading': 'लोड हो रहा है...',
@@ -300,9 +300,9 @@ class AppLocalizations {
       'syncStatus': 'ऑफ़लाइन सिंक्रोनाइज़ेशन कतार',
       'pendingOperations': 'लंबित ऑफ़लाइन बदलाव',
       'manualSync': 'मैनुअल सिंक चलाएं',
-      'aboutApp': 'लॉजिफ़्लो युवा के बारे में',
+      'aboutApp': 'लॉजिफ़्लो के बारे में',
       'appVersion': 'संस्करण 1.0.0 (बिल्ड 20261111)',
-      'developerCredit': 'युवाइन्टर्न लॉजिस्टिक्स मोबाइल एप्लीकेशन',
+      'developerCredit': 'लॉजिफ़्लो लॉजिस्टिक्स सिस्टम्स',
       'privacyPolicy': 'गोपनीयता एवं डेटा सुरक्षा नीति',
       'offlineBanner': 'ऑफ़लाइन मोड: स्थानीय डेटाबेस सक्रिय। नेटवर्क आने पर सिंक होगा।',
       'onlineBanner': 'ऑनलाइन: लाइव कनेक्शन सक्रिय।',

@@ -101,7 +101,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     ),
                     const SizedBox(height: 24),
                     const Text(
-                      'LOGIFLOW YUVA',
+                      'LOGIFLOW',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 26,

@@ -126,7 +126,7 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen> {
         content: TextField(
           controller: _manualInputController,
           decoration: const InputDecoration(
-            hintText: 'e.g. YUV-2026-88401',
+            hintText: 'e.g. LGF-2026-88401',
             prefixIcon: Icon(Icons.pin),
           ),
         ),

@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/localization/app_localizations.dart';
+import '../../../core/network/supabase_config.dart';
 import '../data/auth_repository.dart';
+import '../domain/user_model.dart';
 import 'auth_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -17,28 +19,63 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _fullNameController = TextEditingController();
+  final _phoneController = TextEditingController();
+
   bool _obscurePassword = true;
+  bool _isSignUpMode = false;
+  UserRole _selectedRole = UserRole.shipper;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _fullNameController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
   void _fillDemoCredentials({required bool isShipper}) {
     if (isShipper) {
       _emailController.text = AuthRepository.demoShipper.email;
-      _passwordController.text = 'YuvaShipper2026!';
+      _passwordController.text = 'DemoShipper2026!';
     } else {
       _emailController.text = AuthRepository.demoHubManager.email;
-      _passwordController.text = 'YuvaManager2026!';
+      _passwordController.text = 'DemoManager2026!';
     }
-    setState(() {});
+    setState(() => _isSignUpMode = false);
   }
 
-  Future<void> _handleLogin() async {
+  Future<void> _handleSubmit() async {
     if (!_formKey.currentState!.validate()) return;
+
+    if (_isSignUpMode) {
+      final res = await ref.read(authProvider.notifier).signUp(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+            fullName: _fullNameController.text.trim(),
+            phone: _phoneController.text.trim(),
+            role: _selectedRole,
+          );
+      if (!mounted) return;
+      if (res == 'SIGNED_IN') {
+        context.go('/dashboard');
+      } else if (res == 'CONFIRM_EMAIL') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Verification email sent! Please confirm your email, then log in.'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+        setState(() => _isSignUpMode = false);
+      } else {
+        final err = ref.read(authProvider).errorMessage ?? 'Registration failed.';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(err), backgroundColor: AppColors.error),
+        );
+      }
+      return;
+    }
 
     final success = await ref.read(authProvider.notifier).login(
           _emailController.text.trim(),
@@ -58,20 +95,118 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
+  void _showBackendConfigDialog() {
+    final urlCtrl = TextEditingController(
+      text: SupabaseConfig.isRealBackendConfigured ? SupabaseConfig.url : '',
+    );
+    final keyCtrl = TextEditingController(
+      text: SupabaseConfig.isRealBackendConfigured ? SupabaseConfig.anonKey : '',
+    );
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Supabase Cloud Backend'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              SupabaseConfig.isRealBackendConfigured
+                  ? 'Currently connected to:\n${SupabaseConfig.url}'
+                  : 'Currently running in offline-first SQLite evaluation mode.',
+              style: const TextStyle(fontSize: 12, color: AppColors.textSecondaryLight),
+            ),
+            const SizedBox(height: 14),
+            TextField(
+              controller: urlCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Supabase Project URL',
+                hintText: 'https://xxxx.supabase.co',
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: keyCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Supabase Anon / Publishable Key',
+                hintText: 'eyJhbGci...',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          if (SupabaseConfig.isRealBackendConfigured)
+            TextButton(
+              onPressed: () async {
+                await SupabaseConfig.resetToOfflineDemo();
+                if (ctx.mounted) Navigator.pop(ctx);
+                if (mounted) setState(() {});
+              },
+              child: const Text('Use Offline Demo'),
+            ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final connected = await SupabaseConfig.saveAndConnect(
+                newUrl: urlCtrl.text,
+                newAnonKey: keyCtrl.text,
+              );
+              if (ctx.mounted) Navigator.pop(ctx);
+              if (mounted) {
+                setState(() {});
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      connected
+                          ? 'Connected to live Supabase project!'
+                          : 'Invalid Supabase URL or key.',
+                    ),
+                    backgroundColor: connected ? AppColors.success : AppColors.warning,
+                  ),
+                );
+              }
+            },
+            child: const Text('Connect'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
+    final isLive = SupabaseConfig.isRealBackendConfigured;
 
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 20),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: ActionChip(
+                    avatar: Icon(
+                      isLive ? Icons.cloud_done : Icons.cloud_off,
+                      size: 16,
+                      color: isLive ? AppColors.success : AppColors.textSecondaryLight,
+                    ),
+                    label: Text(
+                      isLive ? 'Live Cloud' : 'Offline Demo',
+                      style: const TextStyle(fontSize: 11),
+                    ),
+                    onPressed: _showBackendConfigDialog,
+                  ),
+                ),
+                const SizedBox(height: 8),
                 Center(
                   child: Container(
                     width: 76,
@@ -84,9 +219,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     child: const Icon(Icons.local_shipping, size: 40, color: AppColors.accent),
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
                 Text(
-                  context.tr('loginTitle'),
+                  _isSignUpMode ? 'Create Logistics Account' : context.tr('loginTitle'),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 26,
@@ -103,7 +238,48 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     color: AppColors.textSecondaryLight,
                   ),
                 ),
-                const SizedBox(height: 36),
+                const SizedBox(height: 28),
+
+                if (_isSignUpMode) ...[
+                  TextFormField(
+                    controller: _fullNameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Full Name',
+                      prefixIcon: Icon(Icons.person_outline),
+                    ),
+                    validator: (v) => _isSignUpMode && (v == null || v.trim().isEmpty)
+                        ? 'Please enter your full name'
+                        : null,
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _phoneController,
+                    keyboardType: TextInputType.phone,
+                    decoration: const InputDecoration(
+                      labelText: 'Contact Phone',
+                      prefixIcon: Icon(Icons.phone_outlined),
+                    ),
+                    validator: (v) => _isSignUpMode && (v == null || v.trim().length < 10)
+                        ? 'Please enter valid phone number'
+                        : null,
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<UserRole>(
+                    value: _selectedRole,
+                    decoration: const InputDecoration(
+                      labelText: 'Account Role',
+                      prefixIcon: Icon(Icons.badge_outlined),
+                    ),
+                    items: const [
+                      DropdownMenuItem(value: UserRole.shipper, child: Text('Shipper')),
+                      DropdownMenuItem(value: UserRole.hubManager, child: Text('Hub Manager')),
+                    ],
+                    onChanged: (val) {
+                      if (val != null) setState(() => _selectedRole = val);
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                ],
 
                 // Email Field
                 TextFormField(
@@ -123,7 +299,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
 
                 // Password Field
                 TextFormField(
@@ -147,33 +323,44 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
 
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Password reset instructions sent to your email.'),
+                if (!_isSignUpMode)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () async {
+                        final email = _emailController.text.trim();
+                        if (email.isEmpty || !email.contains('@')) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Enter your email first to reset password.')),
+                          );
+                          return;
+                        }
+                        await ref.read(authProvider.notifier).resetPassword(email);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Password reset instructions sent to your email.'),
+                            ),
+                          );
+                        }
+                      },
+                      child: Text(
+                        context.tr('forgotPassword'),
+                        style: const TextStyle(
+                          color: AppColors.secondary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
                         ),
-                      );
-                    },
-                    child: Text(
-                      context.tr('forgotPassword'),
-                      style: const TextStyle(
-                        color: AppColors.secondary,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
 
-                // Login Button
+                // Login / Register Button
                 ElevatedButton(
-                  onPressed: authState.isLoading ? null : _handleLogin,
+                  onPressed: authState.isLoading ? null : _handleSubmit,
                   child: authState.isLoading
                       ? const SizedBox(
                           width: 22,
@@ -183,9 +370,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             color: Colors.white,
                           ),
                         )
-                      : Text(context.tr('login')),
+                      : Text(_isSignUpMode ? 'Create Account' : context.tr('login')),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 12),
+
+                TextButton(
+                  onPressed: () => setState(() => _isSignUpMode = !_isSignUpMode),
+                  child: Text(
+                    _isSignUpMode
+                        ? 'Already have an account? Log In'
+                        : 'New to LogiFlow? Create Account',
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
+                const SizedBox(height: 20),
 
                 // Demo Quick Fill Section
                 Row(

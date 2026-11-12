@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/localization/app_localizations.dart';
+import '../../../core/sync/sync_engine.dart';
 import '../../../shared/widgets/offline_banner.dart';
 import '../../../shared/widgets/status_badge.dart';
 import '../../auth/presentation/auth_provider.dart';
@@ -108,6 +109,8 @@ class DashboardScreen extends ConsumerWidget {
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {
+                await ref.read(syncEngineProvider.notifier).syncNow();
+                await ref.read(shipmentRepositoryProvider).pullFromRemote();
                 ref.invalidate(shipmentsStreamProvider);
               },
               child: SingleChildScrollView(
