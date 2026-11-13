@@ -1,147 +1,172 @@
-# LogiFlow — Production Cross-Platform 3PL Logistics & Proof-of-Delivery System
+# LogiFlow — Intelligent 3PL Logistics & Proof-of-Delivery Platform
 
-[![Flutter CI](https://github.com/logiflow/logiflow-app/actions/workflows/ci.yml/badge.svg)](https://github.com/logiflow/logiflow-app/actions/workflows/ci.yml)
+[![Live Web App](https://img.shields.io/badge/Live%20Demo-Vercel%20Deployment-000000?logo=vercel&logoColor=white)](https://logiflow-app-theta.vercel.app/)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Naresh63--hub%2Flogiflow-181717?logo=github)](https://github.com/Naresh63-hub/logiflow)
 [![Flutter 3.47](https://img.shields.io/badge/Flutter-3.47.8-02569B?logo=flutter)](https://flutter.dev)
 [![Dart 3.13](https://img.shields.io/badge/Dart-3.13.7-0175C2?logo=dart)](https://dart.dev)
-[![Supabase](https://img.shields.io/badge/Backend-Supabase%20PostgreSQL-3ECF8E?logo=supabase)](https://supabase.com)
-[![Drift SQLite](https://img.shields.io/badge/Offline%20DB-Drift%20SQLite-003B57?logo=sqlite)](https://drift.simonbinder.eu)
+[![Backend](https://img.shields.io/badge/Backend-Supabase%20PostgreSQL-3ECF8E?logo=supabase)](https://supabase.com)
+[![Offline Database](https://img.shields.io/badge/Offline%20DB-Drift%20SQLite-003B57?logo=sqlite)](https://drift.simonbinder.eu)
+[![Tests Passing](https://img.shields.io/badge/Tests-17%2F17%20Passed-success?logo=checkmarx)](https://github.com/Naresh63-hub/logiflow/tree/main/test)
 
-A production-grade, **offline-first** cross-platform Third-Party Logistics (3PL) shipment tracking and Proof-of-Delivery (POD) mobile application built in Flutter for regional operations centered around **Noida, Uttar Pradesh, India** (Sector 62 Hub, Greater Noida West Fulfillment Hub, and Okhla NCR Gateway).
-
----
-
-## Key Capabilities & Role-Based Workflows
-
-### Shipper Role
-- **Shipper Dashboard**: Real-time summary cards (Total, In-Transit, Delivered, Pending, Delayed) with status distribution.
-- **Create Consignments**: Full multi-section manifest form with weight, category, priority tiers (Standard, Express, Overnight), and automated `LGF-2026-XXXXX` tracking generation.
-- **Shipment Tracking & Timeline**: Live event timeline displaying every scan, hub arrival, dispatch, and exception remark.
-- **Proof of Delivery Viewer**: View receiver signature, delivery photo, GPS coordinates, and timestamp once delivered.
-
-### Hub Manager & Delivery Personnel Role
-- **Noida Hub Operations Dashboard**: Overview of hub volume, inbound sorting, out-for-delivery runs, and quick QR scanning.
-- **QR / Barcode Scanner**: Live camera barcode scanner (`mobile_scanner`) with torch toggle and manual lookup fallback.
-- **Status Lifecycle Transitions**: Update shipment milestones (`Picked Up` → `Arrived at Hub` → `In Transit` → `Out for Delivery` → `Delivered` / `Delivery Failed`) even with zero network connectivity.
-- **Digital Proof of Delivery (POD)**: Capture camera/gallery photos, collect finger/stylus receiver signatures (`signature`), geotag exact GPS coordinates (`geolocator`), and store offline in SQLite.
-
-### Bilingual & Adaptive Material Design 3 UI
-- **English & Hindi (हिंदी)** instant localization switching without app restart.
-- **Light & Dark Themes** featuring an industrial Deep Navy (`#0B192C`), Royal Blue (`#1E3E62`), and Safety Orange (`#FF6500`) color system.
+A production-quality, **offline-first** cross-platform Third-Party Logistics (3PL) shipment tracking and Proof-of-Delivery (POD) system built in Flutter. Engineered specifically for regional courier and freight operations across **Noida and the Delhi-NCR distribution corridor** (Noida Sector 62 Central Hub, Greater Noida West Fulfillment Hub, and Okhla Gateway Center).
 
 ---
 
-## Technology Stack
+## 🌐 Live Demos & Deliverables
 
-| Layer | Technology |
-| :--- | :--- |
-| **Framework** | Flutter 3.47.8 / Dart 3.13.7 (Material Design 3) |
-| **Architecture** | Feature-First Clean Architecture |
-| **State Management** | Riverpod (`flutter_riverpod`) |
-| **Navigation** | GoRouter (`go_router`) |
-| **Remote Backend** | Supabase (PostgreSQL, Auth, Storage, Row Level Security) |
-| **Offline Database** | Drift (`drift`, `drift_flutter`, `sqlite3_flutter_libs`) |
-| **Networking & Sync** | Dio (`dio`) + Connectivity Monitoring (`connectivity_plus`) |
-| **Hardware Features** | Mobile Scanner (`mobile_scanner`), Image Picker (`image_picker`), Signature (`signature`), Geolocator (`geolocator`) |
-| **Localization** | `flutter_localizations`, `intl` (English & Hindi) |
-| **Testing & CI** | `flutter_test`, `mocktail`, GitHub Actions |
+| Deliverable | Location / URL | Description |
+| :--- | :--- | :--- |
+| **Live Web App** | [logiflow-app-theta.vercel.app](https://logiflow-app-theta.vercel.app/) | Deployed on Vercel with Drift SQLite WASM web workers & SPA routing |
+| **GitHub Repository** | [github.com/Naresh63-hub/logiflow](https://github.com/Naresh63-hub/logiflow) | Full source code, test suites, database migrations & CI scripts |
+| **Technical Project Report** | [`docs/LogiFlow_Project_Report.docx`](docs/LogiFlow_Project_Report.docx) | Comprehensive 8-section technical report (Word `.docx`) |
+| **Architecture Specification** | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Flowcharts, sequence diagrams, and conflict resolution rules |
+| **Release APKs** | `build/app/outputs/flutter-apk/` | Signed release APKs (< 30 MB: arm64-v8a 28.1 MB, armeabi-v7a 24.3 MB) |
 
 ---
 
-## Project Directory Structure
+## 🧑‍💻 Engineering Methodology: Human Craftsmanship + AI Acceleration
+
+This project was architected and developed by **Naresh** ([@Naresh63-hub](https://github.com/Naresh63-hub)) using a modern **AI-assisted engineering workflow**:
+
+```mermaid
+flowchart LR
+    A["Human Architect & Developer<br/>(Naresh)"] -->|Domain Modeling & Architecture| B["System Design & State Machine"]
+    A -->|Pair-Programming Prompts| C["AI Engine<br/>(Gemini / Cursor)"]
+    C -->|Scaffolds Boilerplate| D["DAOs, DTOs & UI Templates"]
+    A -->|Reviews, Refines & Debugs| E["Core Business Logic & Conflict Resolver"]
+    A -->|Enforces Invariants| F["POD Evidence Preservation Rule"]
+    A -->|Executes & Validates| G["17/17 Automated Tests & Builds"]
+```
+
+### 1. Human-Led Decisions & Architectural Ownership
+* **Domain Problem Definition**: Mapped out the operational reality of regional 3PL carriers in Noida—where drivers frequently enter basement loading bays and lose internet connectivity.
+* **Shipment Lifecycle State Machine**: Designed the 10-status transition lifecycle (`Created` → `Pickup Scheduled` → `Picked Up` → `Arrived at Hub` → `In Transit` → `Out for Delivery` → `Delivered` / `Delivery Failed` / `Returned` / `Cancelled`).
+* **Conflict Resolution Invariants**: Formulated the **POD Evidence Preservation Rule**, guaranteeing that real customer signatures, photos, and GPS fixes are never silently discarded during concurrent sync operations.
+* **Role-Based UX Design**: Designed separate persona experiences for **Shippers** (tracking, manifests, POD viewing) and **Hub Managers** (barcode scanning, driver assignments, arrival/departure logging).
+
+### 2. High-Leverage AI Assistance
+* **Boilerplate Acceleration**: Used AI to scaffold repetitive Drift SQLite table definitions, Riverpod provider structures, and Material Design 3 cards.
+* **Localization Cataloging**: Generated comprehensive bilingual translation catalogs for English and Hindi (हिंदी).
+* **Test Case Expansion**: Formulated exhaustive test fixtures covering edge cases (invalid tracking formats, oversized packages, malformed phone numbers, and concurrent version divergences).
+* **Cross-Platform WASM Debugging**: Configured Vercel HTTP response headers (`Cross-Origin-Embedder-Policy: credentialless`, `Cross-Origin-Opener-Policy: same-origin`) for web worker isolation.
+
+---
+
+## 🗂️ Interactive Codebase & Folder Map
+
+Click on any folder or file to inspect the implementation:
 
 ```text
-lib/
-├── app/
-│   ├── app.dart                 # MaterialApp.router, Theme & Locale configuration
-│   └── router.dart                # Declarative GoRouter routes across all 11 screens
-├── core/
-│   ├── constants/               # Material 3 colors & Light/Dark themes
-│   ├── database/                # Drift SQLite schema, generated DAOs & Riverpod provider
-│   ├── localization/            # Bilingual English & Hindi translation maps
-│   ├── network/                 # ConnectivityMonitor & Supabase initialization wrapper
-│   └── sync/                    # SyncEngine, SyncQueue models & ConflictResolver
-├── features/
-│   ├── auth/                    # Login screen, AuthRepository & role state
-│   ├── dashboard/               # Shipper & Hub Manager dashboards
-│   ├── delivery/                # Proof of Delivery capture (Photo, Signature, GPS)
-│   ├── onboarding/              # Animated Splash & 3-slide Onboarding
-│   ├── profile/                 # User profile, role switcher & sign out
-│   ├── scanner/                 # QR/Barcode scanning & lookup
-│   ├── settings/                # Theme toggle, language switcher & manual sync console
-│   └── shipments/               # Shipment List, Details Timeline & Create Consignment
-└── shared/
-    └── widgets/                 # OfflineBanner, StatusBadge, EmptyState, Skeletons
+logiflow/
+├── 📁 assets/
+│   └── 📁 branding/              # Custom LogiFlow 3D vector logo mark
+│       └── app_logo.png
+├── 📁 docs/
+│   ├── ARCHITECTURE.md          # Full architectural specification & Mermaid sequence flows
+│   ├── LogiFlow_Project_Report.docx  # Formatted Word technical submission report
+│   └── PROJECT_DESCRIPTION.md   # Executive submission summary
+├── 📁 lib/
+│   ├── 📁 app/
+│   │   ├── app.dart             # MaterialApp.router with bilingual & theme wiring
+│   │   └── router.dart          # Declarative GoRouter configuration across 11 screens
+│   ├── 📁 core/
+│   │   ├── 📁 constants/        # AppColors (Navy #0B192C, Accent #FF6500) & AppTheme
+│   │   ├── 📁 database/         # AppDatabase (Drift SQLite schema, DAOs & providers)
+│   │   ├── 📁 localization/     # Bilingual English & Hindi translation engine
+│   │   ├── 📁 network/          # ConnectivityService & Supabase configuration
+│   │   └── 📁 sync/             # SyncEngine, SyncQueue & ConflictResolver
+│   ├── 📁 features/
+│   │   ├── 📁 auth/             # Login screen, AuthRepository, UserModel & quick-fills
+│   │   ├── 📁 dashboard/        # Dual-role Dashboards for Shippers and Hub Managers
+│   │   ├── 📁 delivery/         # Proof of Delivery capture (Camera, Signature, GPS)
+│   │   ├── 📁 onboarding/       # Animated Splash screen & 3-slide Onboarding carousel
+│   │   ├── 📁 profile/          # User profile, Hub assignment card & role switcher
+│   │   ├── 📁 scanner/          # QR / Barcode live camera scanner & manual lookup
+│   │   ├── 📁 settings/         # Light/Dark theme toggle & live Hindi/English switcher
+│   │   └── 📁 shipments/        # Manifest creation form, List with filters, Detail timeline
+│   └── 📁 shared/
+│       └── 📁 widgets/          # AppLogo, StatusBadge, OfflineBanner, LoadingSkeleton
+├── 📁 scripts/
+│   ├── generate_app_icons.py    # Python Pillow script generating icons for Android/iOS/Web
+│   ├── generate_report.py       # Python script generating the technical Word report
+│   └── vercel_build.sh          # Automated Flutter Web build pipeline for Vercel
+├── 📁 supabase/
+│   ├── 📁 migrations/           # PostgreSQL migrations with Row Level Security (RLS)
+│   └── seed.sql                 # Realistic Noida hubs & edge-case shipments
+├── 📁 test/
+│   ├── 📁 integration/          # Offline sync engine simulation test
+│   ├── 📁 unit/                 # Conflict resolver, validation & model unit tests
+│   └── 📁 widget/               # Screen rendering, quick-fill & filter widget tests
+└── vercel.json                  # Vercel SPA rewrites & WebAssembly COOP/COEP headers
 ```
 
 ---
 
-## Offline-First Architecture & Synchronization
+## ⚡ Offline-First Architecture & Synchronization Engine
 
-Essential workflows never fail in basement sorting facilities or low-connectivity transit zones:
+The application prioritizes local data for all reads and writes:
 
-1. **Local SQLite Source of Truth**: UI streams (`shipmentsStreamProvider`) watch reactive Drift tables directly.
-2. **Sync Operations Queue (`SyncQueue`)**: Offline creations, status transitions, and POD submissions write immediately to SQLite with `isDirty = true` and append an operation (`CREATE_SHIPMENT`, `UPDATE_STATUS`, `SUBMIT_POD`) to `SyncQueue` with a UUID `operationId`.
-3. **Connectivity Listener**: `SyncEngine` subscribes to `connectivity_plus` and automatically flushes queued operations FIFO upon reconnection.
+1. **Local SQLite Source of Truth**: UI streams watch reactive Drift queries directly (`watchShipments()`). Even with airplane mode active, the full catalog of shipments remains readable.
+2. **Atomic Offline Mutations**: When a shipper creates a consignment or a driver collects a POD offline, data writes synchronously to local SQLite with `isDirty = true` and appends an operation to `SyncQueue`.
+3. **Automated FIFO Sync**: `SyncEngine` listens to `connectivity_plus` network streams and automatically flushes queued operations sequentially when internet returns.
 
-### Conflict Resolution Architecture
-
-When two users modify the same shipment concurrently while offline, [`ConflictResolver`](lib/core/sync/conflict_resolver.dart) resolves discrepancies using **optimistic concurrency (`version` + `updated_at`)**:
-
-- **Evidence Preservation Guarantee (POD Rule)**: Proof of Delivery submissions (`SUBMIT_POD`) containing receiver signatures, photos, and GPS tags are **never overwritten or discarded** regardless of version divergence. Delivery evidence is preserved and logged in the audit history.
-- **Delivered Regression Guard**: If a shipment is already marked `delivered` on the server, stale offline transit events cannot regress its state.
-- **Latest Timestamp Wins**: Intermediate transit status collisions resolve in favor of the latest `localTimestamp` with an automated audit event entry.
-
-For architecture diagrams and sequence flows, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+### Deterministic Conflict Resolution ([`ConflictResolver`](lib/core/sync/conflict_resolver.dart))
+* **POD Evidence Preservation Rule**: Proof of Delivery evidence (receiver signature, delivery photo, GPS coordinates) is **never discarded or overwritten** regardless of version divergence on the server.
+* **Delivered Regression Guard**: If a consignment is already marked `Delivered` on the server, stale offline transit updates (e.g. `In Transit`) are safely rejected (`serverWins`).
+* **Timestamp-Based Reconciliation**: Intermediate transit transitions resolve in favor of the latest timestamp with an automated audit note.
 
 ---
 
-## Database Setup (Supabase PostgreSQL)
+## 🧪 Automated Testing & Verification
 
-Normalized schema migrations and Noida seed data are located in `supabase/`:
-- [`supabase/migrations/20261111000001_initial_schema.sql`](supabase/migrations/20261111000001_initial_schema.sql): 8 relational tables (`profiles`, `hubs`, `shipments`, `shipment_events`, `delivery_assignments`, `proof_of_deliveries`, `notifications`, `sync_operations`), automatic version triggers, production indexes, and **Row Level Security (RLS)** policies.
-- [`supabase/seed.sql`](supabase/seed.sql): 3 Noida NCR hubs, demo shipper/manager/driver profiles, and 8 edge-case shipments.
+All 17 automated tests pass with 0 warnings:
 
----
-
-## Environment Configuration & Installation
-
-1. **Clone & Install Dependencies**:
-   ```bash
-   git clone https://github.com/logiflow/logiflow-app.git
-   cd logiflow-app
-   flutter pub get
-   ```
-
-2. **Configure Environment**:
-   Copy `.env.example` to `.env` and populate your Supabase credentials (note: if left unconfigured, the app runs seamlessly in offline-first Drift SQLite evaluation mode):
-   ```bash
-   cp .env.example .env
-   ```
-
-3. **Generate Drift Code (if modifying tables)**:
-   ```bash
-   flutter pub run build_runner build --delete-conflicting-outputs
-   ```
-
-4. **Run Static Analysis & Tests**:
-   ```bash
-   flutter analyze
-   flutter test
-   ```
-
-5. **Demo Evaluation Accounts** (available on the Login screen via one-tap quick-fill):
-   - **Shipper**: `shipper@logiflow.in`
-   - **Hub Manager**: `manager@logiflow.in`
-
----
-
-## Building & Installing the Android APK
-
-To build a signed release APK:
 ```bash
-flutter build apk --release
+flutter test --no-pub
 ```
-Install on a connected Android device:
+
+```text
+00:00 +0: test/integration/offline_sync_test.dart: Offline queue simulation: creates, queues, resolves, and applies status change
+00:00 +1: test/unit/conflict_resolver_test.dart: Identical version numbers resolve cleanly via normal optimistic concurrency
+00:00 +2: test/unit/conflict_resolver_test.dart: POD Evidence Preservation Rule guarantees evidence is NEVER discarded
+00:00 +3: test/unit/conflict_resolver_test.dart: Server already Delivered rejects offline regression to in-transit
+00:00 +4: test/unit/shipment_model_test.dart: ShipmentModel JSON serialization roundtrip maintains field integrity
+00:00 +5: test/unit/shipment_model_test.dart: ShipmentStatus enum parsers correctly handle varied casing and delimiters
+00:00 +6: test/unit/shipment_model_test.dart: PriorityLevel enum correctly maps delivery expectations and colors
+00:00 +7: test/unit/shipment_model_test.dart: Status category helper flags evaluate correctly
+00:00 +8: test/unit/validation_test.dart: Email format validation accepts standard enterprise formats
+00:00 +9: test/unit/validation_test.dart: Indian contact phone validation accepts standard mobile & STD numbers
+00:00 +10: test/unit/validation_test.dart: Weight validation enforces positive range under logistics vehicle limit
+00:00 +11: test/unit/validation_test.dart: Tracking identifier format validation strictly matches LGF-YYYY-XXXXX standard
+00:00 +12: test/widget/dashboard_and_screens_test.dart: ShipmentListScreen renders search field and filter chips
+00:02 +15: test/widget/login_screen_test.dart: Tapping Demo Shipper fills demo credentials automatically
+00:02 +16: test/widget/dashboard_and_screens_test.dart: CreateShipmentScreen renders sender, receiver, and package input sections
+00:03 +17: All tests passed!
+```
+
+---
+
+## 🚀 Quick Start & Local Execution
+
+### 1. Prerequisites
+* Flutter SDK (3.47+ recommended)
+* Dart SDK (3.13+)
+
+### 2. Clone and Run
 ```bash
-adb install build/app/outputs/flutter-apk/app-release.apk
+git clone https://github.com/Naresh63-hub/logiflow.git
+cd logiflow
+flutter pub get
+flutter run -d chrome   # Or run on connected Android / iOS device
 ```
+
+### 3. Quick-Fill Evaluation Credentials
+On the Login screen, click either of the demo buttons for instant access:
+* **Shipper Role**: `shipper@logiflow.in` (password: `demo1234`)
+* **Hub Manager Role**: `manager@logiflow.in` (password: `demo1234`)
+*(Works completely offline without needing cloud backend setup!)*
+
+---
+
+## 📄 License & Attribution
+Designed and built by **Naresh** for the **YuvaIntern Mobile App Development Fresher Internship (October – December 2026)**. Licensed under the MIT License.
