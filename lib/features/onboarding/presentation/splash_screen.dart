@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../shared/widgets/app_logo.dart';
 import '../../auth/presentation/auth_provider.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -78,35 +79,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryLight,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: AppColors.accent, width: 2),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.accent.withOpacity(0.3),
-                            blurRadius: 20,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.local_shipping,
-                        size: 54,
-                        color: AppColors.accent,
-                      ),
-                    ),
+                    const AppLogo(size: 104, withGlow: true),
                     const SizedBox(height: 24),
                     const Text(
                       'LOGIFLOW',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 26,
+                        fontSize: 28,
                         fontWeight: FontWeight.w900,
-                        letterSpacing: 2.0,
+                        letterSpacing: 2.5,
                       ),
                     ),
                     const SizedBox(height: 8),

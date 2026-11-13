@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/network/supabase_config.dart';
+import '../../../shared/widgets/app_logo.dart';
 import '../data/auth_repository.dart';
 import '../domain/user_model.dart';
 import 'auth_provider.dart';
@@ -207,17 +208,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Center(
-                  child: Container(
-                    width: 76,
-                    height: 76,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: AppColors.accent, width: 2),
-                    ),
-                    child: const Icon(Icons.local_shipping, size: 40, color: AppColors.accent),
-                  ),
+                const Center(
+                  child: AppLogo(size: 80, withGlow: true),
                 ),
                 const SizedBox(height: 20),
                 Text(
